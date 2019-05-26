@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Title of the document</title>
+<title>bcd calculate</title>
 <script src='https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.0/knockout-min.js'></script>
 <script>
   function bcdCalculate(hardwareKey){
@@ -55,7 +55,7 @@
 <script>
   var ViewModel = function(hardware){
     this.hardwareKey = ko.observable(hardware);
-    this.activationCode = ko.pureComputed(bcdCalculate, this);
+    this.activationCode = ko.pureComputed(function(){return bcdCalculate(this.hardwareKey())}, this);
   };
   ko.applyBindings(new ViewModel("07C6E9F97C6E9F92"))
 </script>
