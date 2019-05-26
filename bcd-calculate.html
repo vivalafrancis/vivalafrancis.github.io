@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Title of the document</title>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/knockout/3.5.0/knockout-min.js'></script>
+<script>
+  function bcdCalculate(hardwareKey){
+    hardwareKey = hardwareKey || "07C6E9F97C6E9F92"; //test hardwareKey
+    const versionKey = "H40B2E2H00473C8B"; //versionKey for v1.5.5
+    const x = 255;
+    const y = 3072;
+    var keyLength = versionKey.length
+    var aryA = new Array(x);
+    var aryB = new Array(y);
+    var aryI = new Array(keyLength);
+    var i, m, n, t;
+    var o = "";
+    for (i = 0; i <= x; i++) {
+      aryA[i] = i;
+      var j = i % keyLength;
+      aryB[i] = versionKey.codePointAt(j);
+    }
+    m = 0;
+    for (i = 0; i <= x; i++){
+      m = (m + aryA[i] + aryB[i]) % x;
+      t = aryA[i];
+      aryA[i] = aryA[m];
+      aryA[m] = t;
+    }
+    m = 0;
+    n = 0;
+    for (i = 1; i <= y + keyLength; i++){
+      m = (m + 1) % x;
+      n = (n + aryA[m]) % x;
+      t = aryA[m];
+      aryA[m] = aryA[n];
+      aryA[n] = t;
+      if (i > y) {
+        aryI[i-y-1] = hardwareKey.codePointAt(i-y-1) ^ (aryA[(aryA[m] + aryA[n]) % x]);
+      }
+    }
+    for (i = 0; i < keyLength; i++){
+      o += aryI[i].toString(16).padStart(2, "0").toUpperCase();
+    }
+    return o;
+  }
+</script>
+</head>
+
+<body>
+  <p>Hardware Code: <input data-bind="value: hardwareKey" size="40"></p>
+  <p>Activation Code: <input data-bind="value: activationCode" size="40" disabled></p>
+</body>
+<script>
+  var ViewModel = function(hardware){
+    this.hardwareKey = ko.observable(hardware);
+    this.activationCode = ko.pureComputed(bcdCalculate, this);
+  };
+  ko.applyBindings(new ViewModel("07C6E9F97C6E9F92"))
+</script>
+</html>
